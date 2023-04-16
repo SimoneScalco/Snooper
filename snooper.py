@@ -619,7 +619,7 @@ if __name__ == "__main__":
             if report['tech']:
                 retval += "\n\tDetected technologies:\n"
             for tech in report['tech']:
-                    retval += "\t\t| {} {}\n".format(tech['name'], '' if tech['version'] is None else tech['version'])
+                retval += "\t\t| {} {}\n".format(tech['name'], '' if tech['version'] is None else tech['version'])
             if report['headers']:
                 retval += "\n\tDetected the following interesting custom headers:\n"
                 for header in report['headers']:
