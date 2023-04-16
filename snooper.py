@@ -745,85 +745,84 @@ if __name__ == "__main__":
     ##### VULNERABILITY SCANNING
     #################################################################################
 
-    if True:
-        logger.print_title("VULNERABILITY SCANNING")
+    logger.print_title("VULNERABILITY SCANNING")
 
-        # Executing nuclei process
-        bash_command = "nuclei -l {} -sa -s medium,high,critical,unknown".format(OUT_LOCAL_LOOT_SUBS + OUT_FILE_ALL_SUBS_UNIQUE_HTTPX)
-        process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=2)
+    # Executing nuclei process
+    bash_command = "nuclei -l {} -sa -s medium,high,critical,unknown".format(OUT_LOCAL_LOOT_SUBS + OUT_FILE_ALL_SUBS_UNIQUE_HTTPX)
+    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=2)
 
-        nuclei_count_unknown = 0
-        nuclei_count_high = 0
-        nuclei_count_critical = 0
-        nuclei_count_medium = 0
-        nuclei_count_info = 0
+    nuclei_count_unknown = 0
+    nuclei_count_high = 0
+    nuclei_count_critical = 0
+    nuclei_count_medium = 0
+    nuclei_count_info = 0
 
-        nuclei_list_unknown = []
-        nuclei_list_high = []
-        nuclei_list_critical = []
-        nuclei_list_medium = []
-        nuclei_list_info = []
-        nuclei_list_general_color = []
-        nuclei_list_general_plain = []
-        count_err_lines = 0
-        
-        logger.info("Starting vulnerability scanning")
+    nuclei_list_unknown = []
+    nuclei_list_high = []
+    nuclei_list_critical = []
+    nuclei_list_medium = []
+    nuclei_list_info = []
+    nuclei_list_general_color = []
+    nuclei_list_general_plain = []
+    count_err_lines = 0
 
-        # Reading output in realtime
-        while process.poll() is None:
-        #for line in iter(process.stdout.readline, b''):
-            # Reading lines and sanitizing output in stdout
-            line = process.stdout.readline()
-            line = line.decode("utf-8").strip()
-            sanitized_line = re.sub(r'\x1b(\[.*?[@-~]|\].*?(\x07|\x1b\\))', '', line)
-            
-            if line:
-                # Collecting output lines in plain and colored mode
-                nuclei_list_general_color.append(line)
-                nuclei_list_general_plain.append(sanitized_line)
-                
-                if "[info]" in sanitized_line:
-                    logger.info(text=line, label=False)
-                    nuclei_count_info += 1
-                    nuclei_list_info.append(sanitized_line)
-                    
-                elif "[medium]" in sanitized_line:
-                    logger.info(text=line, label=False)
-                    nuclei_count_medium += 1
-                    nuclei_list_medium.append(sanitized_line)
-                    
-                elif "[high]" in sanitized_line:
-                    logger.info(text=line, label=False)
-                    nuclei_count_high += 1
-                    nuclei_list_high.append(sanitized_line)
-                    
-                elif "[critical]" in sanitized_line:
-                    logger.info(text=line, label=False)
-                    nuclei_count_critical += 1
-                    nuclei_list_critical.append(sanitized_line)
-                    
-                elif "[unknown]" in sanitized_line:
-                    logger.info(text=line, label=False)
-                    nuclei_count_unknown += 1
-                    nuclei_list_unknown.append(sanitized_line)
-                    
-                elif "[INF]" in sanitized_line:
-                    logger.info(text=line, label=False)
-                
-                elif "[ERR]" in sanitized_line:
-                    logger.info(text=line, label=False)
-        
-        logger.info("Finishing scanning...")
-        output, error = process.communicate()
+    logger.info("Starting vulnerability scanning")
 
-        with open(OUT_LOCAL_LOOT_NUCLEI + OUT_FILE_NUCLEI_COLOR, "w", encoding="utf-8") as nf:
-            for entry in nuclei_list_general_color:
-                nf.write(entry + "\n")
+    # Reading output in realtime
+    while process.poll() is None:
+    #for line in iter(process.stdout.readline, b''):
+        # Reading lines and sanitizing output in stdout
+        line = process.stdout.readline()
+        line = line.decode("utf-8").strip()
+        sanitized_line = re.sub(r'\x1b(\[.*?[@-~]|\].*?(\x07|\x1b\\))', '', line)
 
-        with open(OUT_LOCAL_LOOT_NUCLEI + OUT_FILE_NUCLEI_PLAIN, "w", encoding="utf-8") as nf:
-            for entry in nuclei_list_general_plain:
-                nf.write(entry + "\n")
-                
+        if line:
+            # Collecting output lines in plain and colored mode
+            nuclei_list_general_color.append(line)
+            nuclei_list_general_plain.append(sanitized_line)
+
+            if "[info]" in sanitized_line:
+                logger.info(text=line, label=False)
+                nuclei_count_info += 1
+                nuclei_list_info.append(sanitized_line)
+
+            elif "[medium]" in sanitized_line:
+                logger.info(text=line, label=False)
+                nuclei_count_medium += 1
+                nuclei_list_medium.append(sanitized_line)
+
+            elif "[high]" in sanitized_line:
+                logger.info(text=line, label=False)
+                nuclei_count_high += 1
+                nuclei_list_high.append(sanitized_line)
+
+            elif "[critical]" in sanitized_line:
+                logger.info(text=line, label=False)
+                nuclei_count_critical += 1
+                nuclei_list_critical.append(sanitized_line)
+
+            elif "[unknown]" in sanitized_line:
+                logger.info(text=line, label=False)
+                nuclei_count_unknown += 1
+                nuclei_list_unknown.append(sanitized_line)
+
+            elif "[INF]" in sanitized_line:
+                logger.info(text=line, label=False)
+
+            elif "[ERR]" in sanitized_line:
+                logger.info(text=line, label=False)
+
+    logger.info("Finishing scanning...")
+    output, error = process.communicate()
+
+    with open(OUT_LOCAL_LOOT_NUCLEI + OUT_FILE_NUCLEI_COLOR, "w", encoding="utf-8") as nf:
+        for entry in nuclei_list_general_color:
+            nf.write(entry + "\n")
+
+    with open(OUT_LOCAL_LOOT_NUCLEI + OUT_FILE_NUCLEI_PLAIN, "w", encoding="utf-8") as nf:
+        for entry in nuclei_list_general_plain:
+            nf.write(entry + "\n")
+
     #################################################################################
     ##### [SYNC] ENUMERATING PUBLIC RESOURCES IN AWS, AZURE, GOOGLE CLOUD")
     #################################################################################
